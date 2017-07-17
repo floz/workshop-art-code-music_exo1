@@ -70,6 +70,7 @@ class Main {
 		this.phi += .05
 
 		// play with audio.values[ 2 ], the green bar of the preview
+		// There is 7 value (audio.values.length = 8)
 		scale = .1 + .05 * audio.values[ 2 ]
 		this.meshSmall.scale.set( scale, scale, scale )
 
