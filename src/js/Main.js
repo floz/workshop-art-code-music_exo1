@@ -3,6 +3,10 @@ import fsBasic from "shaders/basic.fs"
 
 import audio from "mnf/audio"
 
+import MeshCustomMaterial from "MeshCustomMaterial"
+
+const TEXTURE = new THREE.TextureLoader().load( "./imgs/toto.jpg" )
+
 class Main {
 
 	constructor(){
@@ -16,17 +20,23 @@ class Main {
 		// create camera
 		this.camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 1000 )
 		this.camera.position.z = 800
+
+		this.scene.add( new THREE.AmbientLight( {color: 0xffffff } ) )
+		const pl = new THREE.PointLight( 0x00ff00, 1, 1000 )
+		pl.position.y = 100
+		this.scene.add( pl )
 		
 		// create a big central Icosahedron
 		let geometry = new THREE.IcosahedronGeometry(100,2)
-		let material = new THREE.MeshBasicMaterial( { color: 0xFF00FF, wireframe:true } )
+		let material = new MeshCustomMaterial( { color: 0xFF00FF, wireframe:false } )
 		this.meshBig = new THREE.Mesh( geometry, material )
 		this.scene.add( this.meshBig )
 
 		// create a small Icosahedron with custom material
 		let customMaterial = new THREE.RawShaderMaterial( { 
 			uniforms: {
-				color: { type: "c", value: new THREE.Color( 0x00ff00 ) }
+				color: { type: "c", value: new THREE.Color( 0x00ff00 ) },
+				tex: { type: "t", value: TEXTURE }
 			},
 			vertexShader: vsBasic,
 			fragmentShader: fsBasic
@@ -55,6 +65,8 @@ class Main {
 	// each frame
 	animate = () => {
 		requestAnimationFrame( this.animate )
+
+		// console.log( this.customMat.lights, this.customMat.isMeshStandardMaterial )
 
 		this.meshBig.rotation.x += 0.005
 		this.meshBig.rotation.y += 0.01
