@@ -3,8 +3,6 @@ import fsBasic from "shaders/basic.fs"
 
 import audio from "mnf/audio"
 
-import MeshCustomMaterial from "MeshCustomMaterial"
-
 const TEXTURE = new THREE.TextureLoader().load( "./imgs/toto.jpg" )
 
 class Main {
@@ -26,9 +24,19 @@ class Main {
 		pl.position.y = 100
 		this.scene.add( pl )
 		
+		// Let's add some lights
+		this.scene.add( new THREE.AmbientLight( 0x222222 ) );
+
+		const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+		directionalLight.position.set( 1, 1, 1 ).normalize();
+		this.scene.add( directionalLight );
+
 		// create a big central Icosahedron
-		let geometry = new THREE.IcosahedronGeometry(100,2)
-		let material = new MeshCustomMaterial( { color: 0xFF00FF, wireframe:false } )
+		let geometry = new THREE.IcosahedronGeometry( 100, 2 )
+		// https://threejs.org/examples/?q=Physical#webgl_materials_variations_physical
+		let material = new THREE.MeshPhysicalMaterial( {
+			color: new THREE.Color( 0x0000ff ),
+		} )
 		this.meshBig = new THREE.Mesh( geometry, material )
 		this.scene.add( this.meshBig )
 
@@ -45,12 +53,15 @@ class Main {
 		this.meshSmall.scale.set( 1, 1, 1 )
 		this.scene.add( this.meshSmall )
 
+		const pointLight = new THREE.PointLight( 0xffffff, 2, 800 );
+		this.meshSmall.add( pointLight );
+
 		this.theta = 0
 		this.phi = 0
 		this.radius = 150
 
 		// if you don't want to hear the music, but keep analysing it, set 'shutup' to 'true'!
-		audio.start( { live: false, shutup: false, showPreview: true } )
+		audio.start( { live: false, shutup: false, showCanvas: true  } )
 		audio.onBeat.add( this.onBeat )
 
 		window.addEventListener( 'resize', this.onResize, false )
@@ -66,14 +77,14 @@ class Main {
 	animate = () => {
 		requestAnimationFrame( this.animate )
 
-		// console.log( this.customMat.lights, this.customMat.isMeshStandardMaterial )
-
 		this.meshBig.rotation.x += 0.005
 		this.meshBig.rotation.y += 0.01
 		// play with audio.volume
 		let scale = 1 + .025 * audio.volume
 		this.meshBig.scale.set( scale, scale, scale )
 
+		// 3D rotation !
+		// Keep the formula :)
 		this.meshSmall.position.x = Math.cos( this.theta ) * Math.sin( this.phi ) * this.radius
 		this.meshSmall.position.y = Math.sin( this.theta ) * Math.sin( this.phi ) * this.radius
 		this.meshSmall.position.z = Math.cos( this.phi ) * this.radius
