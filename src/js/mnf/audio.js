@@ -247,7 +247,6 @@ class Audio {
 
 			}
 			this.ctx.beginPath();
-			// this.ctx.rect(0, 6, 256*(this.audio.currentTime/this.audio.duration), 6)
 			this.ctx.rect(0, H_CANVAS, x, H_INFO_BAR)
 			this.ctx.fillStyle = 'rgba(255,255,255,.9)'
 			this.ctx.fill()
