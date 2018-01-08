@@ -1,7 +1,9 @@
 import vsBasic from "shaders/basic.vs"
 import fsBasic from "shaders/basic.fs"
 
-import audio from "mnf/audio"
+import audio from "mnf/audio/audio"
+import AudioAnalyser from 'mnf/audio/AudioAnalyser'
+import AudioDebugger from 'mnf/audio/AudioDebugger'
 
 const TEXTURE = new THREE.TextureLoader().load( "./imgs/toto.jpg" )
 
@@ -60,13 +62,24 @@ class Main {
 		this.phi = 0
 		this.radius = 150
 
+		this.volumeScale = 10
+
 		// if you don't want to hear the music, but keep analysing it, set 'shutup' to 'true'!
-		audio.start( { live: false, shutup: false, showCanvas: true  } )
-		audio.onBeat.add( this.onBeat )
+		// audio.start( { live: false, shutup: false, showCanvas: true  } )
+		// audio.onBeat.add( this.onBeat )
+		audio.start({  
+			live : false,
+			playlist : ["audio/galvanize.mp3"], 
+			mute : false,
+			onLoad : ()=>{
+				audio.analyser = new AudioAnalyser(audio)
+				audio.analyser.debugger = new AudioDebugger(audio.analyser)
+				audio.onBeat.add( this.onBeat ) 
+				this.animate()
+			}
+		} )
 
 		window.addEventListener( 'resize', this.onResize, false )
-
-		this.animate()
 	}
 
 	onBeat = () => {
@@ -80,7 +93,7 @@ class Main {
 		this.meshBig.rotation.x += 0.005
 		this.meshBig.rotation.y += 0.01
 		// play with audio.volume
-		let scale = 1 + .025 * audio.volume
+		let scale = 1 + .025 * audio.volume * this.volumeScale
 		this.meshBig.scale.set( scale, scale, scale )
 
 		// 3D rotation !
@@ -94,7 +107,7 @@ class Main {
 
 		// play with audio.values[ 2 ], the green bar of the preview
 		// There is 7 value (audio.values.length = 8)
-		scale = .1 + .05 * audio.values[ 2 ]
+		scale = .1 + .05 * audio.analyser.ranges[ 2 ].volume * this.volumeScale
 		this.meshSmall.scale.set( scale, scale, scale )
 
 		this.renderer.render( this.scene, this.camera )
