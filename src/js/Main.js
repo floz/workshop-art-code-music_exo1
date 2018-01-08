@@ -5,6 +5,8 @@ import audio from "mnf/audio/audio"
 import AudioAnalyser from 'mnf/audio/AudioAnalyser'
 import AudioDebugger from 'mnf/audio/AudioDebugger'
 
+import CustomStandardMaterial from "./CustomStandardMaterial"
+
 const TEXTURE = new THREE.TextureLoader().load( "./imgs/toto.jpg" )
 
 class Main {
@@ -36,7 +38,7 @@ class Main {
 		// create a big central Icosahedron
 		let geometry = new THREE.IcosahedronGeometry( 100, 2 )
 		// https://threejs.org/examples/?q=Physical#webgl_materials_variations_physical
-		let material = new THREE.MeshPhysicalMaterial( {
+		let material = new CustomStandardMaterial( {
 			color: new THREE.Color( 0x0000ff ),
 		} )
 		this.meshBig = new THREE.Mesh( geometry, material )
